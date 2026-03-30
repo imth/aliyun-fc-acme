@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest tests/ -v
+      - run: ruff check .
+      - run: ruff format --check .
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull manylinux image
+        run: docker pull quay.io/pypa/manylinux2014_x86_64
+      - name: Build deploy.zip
+        run: |
+          mkdir -p build
+          docker run --rm \
+            -v "$PWD:/app" -w /app \
+            -u "$(id -u):$(id -g)" \
+            quay.io/pypa/manylinux2014_x86_64 \
+            /opt/python/cp312-cp312/bin/pip install . -t build --quiet
+          cp index.py build/
+          cd build && zip -r ../deploy.zip . -q
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy
+          path: deploy.zip
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: deploy.zip
+          generate_release_notes: true
