@@ -15,7 +15,7 @@ class CertConfig:
 class AppConfig:
     cert_configs: list[CertConfig]
     acme_email: str | None = None
-    acme_staging: bool = True
+    acme_staging: bool = False
     renew_days: int = 30
     deploy_to: list[str] = field(default_factory=list)
 
@@ -38,8 +38,8 @@ def load_config() -> AppConfig:
         for c in raw_certs
     ]
 
-    staging_str = os.environ.get("ACME_STAGING", "true").lower()
-    acme_staging = staging_str != "false"
+    staging_str = os.environ.get("ACME_STAGING", "false").lower()
+    acme_staging = staging_str == "true"
 
     renew_days = int(os.environ.get("RENEW_DAYS", "30"))
     renew_days = max(1, min(90, renew_days))

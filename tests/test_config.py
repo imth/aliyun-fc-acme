@@ -18,22 +18,22 @@ class TestLoadConfig:
         assert config.cert_configs[0].domains == ["example.com", "*.example.com"]
         assert config.acme_email == "admin@example.com"
 
-    def test_defaults_staging_to_true(self, monkeypatch):
+    def test_defaults_staging_to_false(self, monkeypatch):
         certs = [{"name": "t.com", "domains": ["t.com"]}]
         monkeypatch.setenv("CERT_CONFIGS", json.dumps(certs))
         monkeypatch.setenv("ACME_EMAIL", "a@b.com")
-
-        config = load_config()
-        assert config.acme_staging is True
-
-    def test_staging_false(self, monkeypatch):
-        certs = [{"name": "t.com", "domains": ["t.com"]}]
-        monkeypatch.setenv("CERT_CONFIGS", json.dumps(certs))
-        monkeypatch.setenv("ACME_EMAIL", "a@b.com")
-        monkeypatch.setenv("ACME_STAGING", "false")
 
         config = load_config()
         assert config.acme_staging is False
+
+    def test_staging_true(self, monkeypatch):
+        certs = [{"name": "t.com", "domains": ["t.com"]}]
+        monkeypatch.setenv("CERT_CONFIGS", json.dumps(certs))
+        monkeypatch.setenv("ACME_EMAIL", "a@b.com")
+        monkeypatch.setenv("ACME_STAGING", "true")
+
+        config = load_config()
+        assert config.acme_staging is True
 
     def test_defaults_renew_days_to_30(self, monkeypatch):
         certs = [{"name": "t.com", "domains": ["t.com"]}]

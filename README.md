@@ -24,9 +24,13 @@ Environment variables:
 |----------|----------|-------------|---------|
 | `CERT_CONFIGS` | Yes | JSON certificate group config | - |
 | `ACME_EMAIL` | No | ACME email for expiry reminders | empty |
-| `ACME_STAGING` | No | Use LE staging environment | `true` |
+| `ACME_STAGING` | No | Use LE staging environment | `false` |
 | `RENEW_DAYS` | No | Days before expiry to trigger renewal | `30` |
 | `DEPLOY_TO` | No | Deploy targets, comma-separated (currently: `oss`) | empty (CAS only) |
+
+> **Note**: When configuring `CERT_CONFIGS` in the FC console, enter the raw JSON directly **without** wrapping quotes. Example:
+>
+> `[{"name": "example.com", "domains": ["example.com", "*.example.com"]}]`
 
 #### CERT_CONFIGS Format
 
@@ -136,9 +140,13 @@ python -m pytest tests/ -v
 |------|------|------|--------|
 | `CERT_CONFIGS` | 是 | JSON 域名分组配置 | - |
 | `ACME_EMAIL` | 否 | ACME 注册邮箱（用于证书过期提醒） | 空 |
-| `ACME_STAGING` | 否 | 使用 LE staging 环境 | `true` |
+| `ACME_STAGING` | 否 | 使用 LE staging 环境 | `false` |
 | `RENEW_DAYS` | 否 | 到期前多少天续期 | `30` |
 | `DEPLOY_TO` | 否 | 自动部署目标服务，逗号分隔（目前支持: `oss`） | 空（仅上传 CAS） |
+
+> **注意**：在 FC 控制台配置 `CERT_CONFIGS` 时，直接填写 JSON 内容，**不要**在两端加引号。示例：
+>
+> `[{"name": "example.com", "domains": ["example.com", "*.example.com"]}]`
 
 #### CERT_CONFIGS 格式
 
